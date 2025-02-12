@@ -1,4 +1,3 @@
-/* Reset some default styles */
 * {
     margin: 0;
     padding: 0;
@@ -6,62 +5,62 @@
     font-family: Arial, sans-serif;
 }
 
-/* Center the form on the screen */
 body {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: #f5f5f5;
+    background: url('background.jpg') no-repeat center center/cover;
+    position: relative;
 }
 
-/* Form container */
-.container {
-    background: white;
-    padding: 25px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    width: 350px;
-    text-align: center;
-}
-
-/* Heading */
-h2 {
-    margin-bottom: 15px;
-}
-
-/* Input fields */
-input {
+.background-overlay {
+    position: absolute;
     width: 100%;
-    padding: 12px;
-    margin: 10px 0;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.container {
+    position: relative;
+    z-index: 2;
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 350px;
+}
+
+h2 {
+    margin-bottom: 1rem;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
     border: 1px solid #ccc;
     border-radius: 5px;
-    font-size: 14px;
 }
 
-/* Submit button */
 button {
     width: 100%;
-    padding: 12px;
-    background: #007bff;
+    padding: 10px;
+    background: #28a745;
     color: white;
     border: none;
     border-radius: 5px;
-    font-size: 16px;
     cursor: pointer;
     margin-top: 10px;
-    transition: 0.3s;
 }
 
 button:hover {
-    background: #0056b3;
+    background: #218838;
 }
 
-/* Toggle login/signup text */
 #toggle-text {
-    margin-top: 15px;
-    font-size: 14px;
+    margin-top: 10px;
 }
 
 #toggle-text a {
@@ -74,9 +73,19 @@ button:hover {
     text-decoration: underline;
 }
 
-/* Error message */
-.error {
-    color: red;
-    font-size: 12px;
-    margin-top: 8px;
+.hide {
+    display: none;
+}
+
+#forgot-password {
+    display: block;
+    text-align: right;
+    font-size: 0.9em;
+    color: #007bff;
+    text-decoration: none;
+    margin-top: 5px;
+}
+
+#forgot-password:hover {
+    text-decoration: underline;
 }
