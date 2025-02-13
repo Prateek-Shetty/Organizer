@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+            display: inline-block;
+            text-align: left;
+            color: black;
+        }
+
+        label, select, button, input {
+            font-size: 16px;
+            margin: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+            background: #f0f0f0;
+        }
+
+        th {
+            background: #2575fc;
+            color: white;
+        }
+
+        button {
+            padding: 10px 15px;
+            background: #2575fc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #6a11cb;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Timetable Generator</h1>
+
+    <div class="container">
+        <label for="days">Number of Days:</label>
+        <select id="days">
+            <option value="5">5 (Mon-Fri)</option>
+            <option value="6">6 (Mon-Sat)</option>
+            <option value="7">7 (Mon-Sun)</option>
+        </select>
+
+        <label for="slots">Number of Time Slots:</label>
+        <select id="slots">
+            <option value="1">1 Slot</option>
+            <option value="2">2 Slots</option>
+            <option value="3">3 Slots</option>
+            <option value="4">4 Slots</option>
+            <option value="5">5 Slots</option>
+            <option value="6">6 Slots</option>
+            <option value="7">7 Slots</option>
+            <option value="8">8 Slots</option>
+            <option value="9">9 Slots</option>
+            <option value="10">10 Slots</option>
+        </select>
+
+        <label for="subjects">Subjects (comma-separated):</label>
+        <input type="text" id="subjects" placeholder="Math, Science, English">
+
+        <button onclick="generateTable()">Generate Timetable</button>
+        <button onclick="downloadPDF()">Download PDF</button>
+
+        <table id="timetable"></table>
+    </div>
+
+    <script>
+        function generateTable() {
+            const days = parseInt(document.getElementById("days").value);
+            const slots = parseInt(document.getElementById("slots").value);
+            const subjects = document.getElementById("subjects").value.split(",").map(s => s.trim());
+
+            if (subjects.length === 0 || subjects[0] === "") {
+                alert("Please enter subjects.");
+                return;
+            }
+
+            const table = document.getElementById("timetable");
+            table.innerHTML = "";
+
+            // Create header row
+            let headerRow = "<tr><th>Time Slots</th>";
+            const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+            for (let i = 0; i < days; i++) {
+                headerRow += `<th>${weekdays[i]}</th>`;
+            }
+            headerRow += "</tr>";
+            table.innerHTML += headerRow;
+
+            // Generate timetable slots
+            for (let i = 0; i < slots; i++) {
+                let row = `<tr><td>Slot ${i + 1}</td>`;
+                for (let j = 0; j < days; j++) {
+                    const randomSubject = subjects[Math.floor(Math.random() * subjects.length)];
+                    row += `<td contenteditable="true">${randomSubject}</td>`;
+                }
+                row += "</tr>";
+                table.innerHTML += row;
+            }
+        }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16);
+            doc.text("Generated Timetable", 10, 10);
+            doc.setFontSize(12);
+
+            const table = document.getElementById("timetable");
+            const rows = table.getElementsByTagName("tr");
+
+            let y = 20;
+            for (let i = 0; i < rows.length; i++) {
+                let rowText = "";
+                const cells = rows[i].getElementsByTagName("td");
+                for (let j = 0; j < cells.length; j++) {
+                    rowText += cells[j].innerText + "  |  ";
+                }
+                doc.text(rowText, 10, y);
+                y += 10;
+            }
+
+            doc.save("timetable.pdf");
+        }
+    </script>
+
+</body>
+</html>

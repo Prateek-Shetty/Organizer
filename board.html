@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Interactive Whiteboard</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            font-family: Arial, sans-serif;
+        }
+
+        #toolbar {
+            display: flex;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 10px;
+        }
+
+        button, input[type="color"], input[type="file"] {
+            padding: 10px 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button {
+            background: #ffffff;
+            color: #333;
+            box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background: #2575fc;
+            color: white;
+        }
+
+        input[type="color"] {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            padding: 0;
+        }
+
+        canvas {
+            border: 4px solid white;
+            border-radius: 10px;
+            background-color: white;
+            cursor: crosshair;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+            width: 80%;
+            height: 80%;
+        }
+
+        .text-input {
+            position: absolute;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 20px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+            padding: 5px;
+            color: black;
+            outline: none;
+            box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toolbar">
+        <button id="drawMode">Draw</button>
+        <button id="textMode">Text</button>
+        <button id="undo">Undo</button>
+        <button id="redo">Redo</button>
+        <input type="color" id="colorPicker">
+        <input type="file" id="uploadImage" accept="image/*">
+        <button id="clear">Clear</button>
+        <button id="download">Download</button>
+    </div>
+    
+    <canvas id="board"></canvas>
+
+    <script>
+        const canvas = document.getElementById("board");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = window.innerWidth * 0.8;
+        canvas.height = window.innerHeight * 0.8;
+
+        let drawing = false;
+        let textMode = false;
+        let history = [];
+        let redoStack = [];
+        let color = "#000000";
+
+        function saveState() {
+            redoStack = [];
+            history.push(canvas.toDataURL());
+        }
+
+        document.getElementById("drawMode").addEventListener("click", () => {
+            textMode = false;
+        });
+
+        document.getElementById("textMode").addEventListener("click", () => {
+            textMode = true;
+        });
+
+        document.getElementById("colorPicker").addEventListener("input", (e) => {
+            color = e.target.value;
+        });
+
+        document.getElementById("clear").addEventListener("click", () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            saveState();
+        });
+
+        document.getElementById("undo").addEventListener("click", () => {
+            if (history.length > 1) {
+                redoStack.push(history.pop());
+                let img = new Image();
+                img.src = history[history.length - 1];
+                img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                };
+            }
+        });
+
+        document.getElementById("redo").addEventListener("click", () => {
+            if (redoStack.length > 0) {
+                let img = new Image();
+                img.src = redoStack.pop();
+                img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                    saveState();
+                };
+            }
+        });
+
+        canvas.addEventListener("mousedown", (e) => {
+            if (textMode) return;
+            drawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        });
+
+        canvas.addEventListener("mousemove", (e) => {
+            if (!drawing || textMode) return;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+        });
+
+        canvas.addEventListener("mouseup", () => {
+            if (!textMode) {
+                drawing = false;
+                saveState();
+            }
+        });
+
+        canvas.addEventListener("click", (e) => {
+            if (!textMode) return;
+            createTextInput(e.offsetX, e.offsetY);
+        });
+
+        function createTextInput(x, y) {
+            const input = document.createElement("input");
+            input.type = "text";
+            input.className = "text-input";
+            input.style.left = `${canvas.offsetLeft + x}px`;
+            input.style.top = `${canvas.offsetTop + y}px`;
+            input.style.color = color;
+
+            document.body.appendChild(input);
+            input.focus();
+
+            input.addEventListener("blur", () => {
+                if (input.value.trim() !== "") {
+                    ctx.fillStyle = color;
+                    ctx.font = "20px Arial";
+                    ctx.fillText(input.value, x, y);
+                    saveState();
+                }
+                document.body.removeChild(input);
+            });
+        }
+
+        document.getElementById("uploadImage").addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        saveState();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById("download").addEventListener("click", () => {
+            const link = document.createElement("a");
+            link.download = "whiteboard.png";
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+
+        saveState();
+    </script>
+
+</body>
+</html>
