@@ -69,10 +69,11 @@
     <div class="container">
         <label for="days">Number of Days:</label>
         <select id="days">
-            <option value="2">7 (Sat-Sun)</option>
-            <option value="5">5 (Mon-Fri)</option>
-            <option value="6">6 (Mon-Sat)</option>
-            <option value="7">7 (Mon-Sun)</option>
+            <option value="5">Mon - Fri (5 days)</option>
+            <option value="2s">Sat - Sun (2 days)</option>
+            <option value="7">Mon - Sun (7 days)</option>
+            <option value="1">Single Day</option>
+            <option value="2">Two Days</option>
         </select>
 
         <label for="slots">Number of Time Slots:</label>
@@ -100,7 +101,31 @@
 
     <script>
         function generateTable() {
-            const days = parseInt(document.getElementById("days").value);
+            const daysValue = document.getElementById("days").value;
+            let days;
+            let selectedDays;
+
+            switch (daysValue) {
+                case "5":
+                    selectedDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+                    break;
+                case "2s":
+                    selectedDays = ["Saturday", "Sunday"];
+                    break;
+                case "7":
+                    selectedDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+                    break;
+                case "1":
+                    selectedDays = ["Day 1"];
+                    break;
+                case "2":
+                    selectedDays = ["Day 1", "Day 2"];
+                    break;
+                default:
+                    selectedDays = [];
+            }
+
+            days = selectedDays.length;
             const slots = parseInt(document.getElementById("slots").value);
             const subjects = document.getElementById("subjects").value.split(",").map(s => s.trim());
 
@@ -112,16 +137,13 @@
             const table = document.getElementById("timetable");
             table.innerHTML = "";
 
-            // Create header row
             let headerRow = "<tr><th>Time Slots</th>";
-            const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
             for (let i = 0; i < days; i++) {
-                headerRow += `<th>${weekdays[i]}</th>`;
+                headerRow += `<th>${selectedDays[i]}</th>`;
             }
             headerRow += "</tr>";
             table.innerHTML += headerRow;
 
-            // Generate timetable slots
             for (let i = 0; i < slots; i++) {
                 let row = `<tr><td>Slot ${i + 1}</td>`;
                 for (let j = 0; j < days; j++) {
