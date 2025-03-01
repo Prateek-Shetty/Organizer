@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimelyMind - Task Assignment Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Task Tracker Styles */
+        .task-tracker {
+            text-align: center;
+            padding: 30px;
+        }
+        .task-container {
+            margin-bottom: 20px;
+        }
+        #taskInput {
+            padding: 8px;
+            width: 250px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 8px 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        table {
+            width: 80%;
+            margin: 0 auto;
+            border-collapse: collapse;
+            background: #f8f8f8;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background: #444;
+            color: white;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            padding: 5px 10px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">TimelyMind</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+        </ul>
+    </nav>
+
+    <!-- Task Assignment Tracker Section -->
+    <section class="task-tracker">
+        <h2>Task Assignment Tracker</h2>
+        <div class="task-container">
+            <input type="text" id="taskInput" placeholder="Enter task...">
+            <button onclick="addTask()">Add Task</button>
+        </div>
+        <table id="taskTable">
+            <thead>
+                <tr>
+                    <th>Task</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Tasks will be dynamically added here -->
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <a href="#">About</a>
+        <a href="#">Privacy</a>
+        <a href="#">Contact</a>
+    </footer>
+
+    <script>
+        function addTask() {
+            let taskInput = document.getElementById("taskInput");
+            let taskValue = taskInput.value.trim();
+            if (taskValue === "") return;
+
+            let table = document.getElementById("taskTable").getElementsByTagName('tbody')[0];
+            let newRow = table.insertRow();
+
+            let taskCell = newRow.insertCell(0);
+            let statusCell = newRow.insertCell(1);
+            let actionCell = newRow.insertCell(2);
+
+            taskCell.textContent = taskValue;
+            statusCell.innerHTML = '<select><option>Pending</option><option>In Progress</option><option>Completed</option></select>';
+            actionCell.innerHTML = '<button class="delete-btn" onclick="deleteTask(this)">Delete</button>';
+
+            taskInput.value = "";
+        }
+
+        function deleteTask(button) {
+            let row = button.parentElement.parentElement;
+            row.remove();
+        }
+    </script>
+</body>
+</html>

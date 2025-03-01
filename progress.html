@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimelyMind - Progress Tracker</title>
+    <style>
+        /* Navbar */
+        nav { background: #333; padding: 15px; display: flex; justify-content: center; align-items: center; }
+        nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-grow: 1; justify-content: center;}
+        nav ul li { margin-right: 20px; }
+        nav ul li a { color: white; text-decoration: none; font-size: 18px; }
+        nav div {flex-shrink: 0;}
+        
+        /* Main Container */
+        .container { max-width: 600px; margin: 30px auto; text-align: center; }
+        input, button { padding: 10px; margin: 5px; width: 90%; }
+        .progress-item { background: #f4f4f4; padding: 10px; margin: 10px; border-radius: 5px; }
+        .progress-bar { height: 20px; background: #ddd; width: 100%; border-radius: 5px; position: relative; }
+        .progress-fill { height: 100%; background: green; border-radius: 5px; width: 0%; text-align: center; color: white; }
+        .delete-btn { background: red; color: white; border: none; padding: 5px; cursor: pointer; }
+
+        /* Footer */
+        footer { background: #333; color: white; text-align: center; padding: 10px; position: absolute; bottom: 0; width: 100%; }
+        footer a { color: white; text-decoration: none; margin: 10px; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <div><a href="#" style="color: white; font-size: 20px;">TimelyMind</a></div>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+        </ul>
+    </nav>
+
+    <!-- Progress Tracker Section -->
+    <div class="container">
+        <h2>Track Your Progress</h2>
+        <input type="text" id="taskName" placeholder="Enter task name...">
+        <input type="number" id="progressValue" placeholder="Enter progress (0-100%)" min="0" max="100">
+        <button onclick="addProgress()">Add Task</button>
+        <div id="progressList"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <a href="#">About</a> | 
+        <a href="#">Privacy</a> | 
+        <a href="#">Contact</a>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            loadProgress();
+        });
+
+        function addProgress() {
+            let taskName = document.getElementById("taskName").value;
+            let progressValue = document.getElementById("progressValue").value;
+            if (!taskName || progressValue === "" || progressValue < 0 || progressValue > 100) {
+                alert("Enter a valid task and progress (0-100%).");
+                return;
+            }
+            
+            let progress = { task: taskName, value: progressValue };
+            saveProgress(progress);
+            displayProgress(progress);
+        }
+
+        function saveProgress(progress) {
+            let progressList = JSON.parse(localStorage.getItem("progressList")) || [];
+            progressList.push(progress);
+            localStorage.setItem("progressList", JSON.stringify(progressList));
+        }
+
+        function loadProgress() {
+            let progressList = JSON.parse(localStorage.getItem("progressList")) || [];
+            progressList.forEach(progress => displayProgress(progress));
+        }
+
+        function displayProgress(progress) {
+            let progressList = document.getElementById("progressList");
+            let progressItem = document.createElement("div");
+            progressItem.className = "progress-item";
+            progressItem.innerHTML = `
+                <strong>${progress.task}</strong> - ${progress.value}% 
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${progress.value}%;"></div>
+                </div>
+                <button class='delete-btn' onclick='deleteProgress(this, "${progress.task}")'>Delete</button>`;
+            progressList.appendChild(progressItem);
+        }
+
+        function deleteProgress(button, taskName) {
+            button.parentElement.remove();
+            let progressList = JSON.parse(localStorage.getItem("progressList")) || [];
+            let updatedList = progressList.filter(progress => progress.task !== taskName);
+            localStorage.setItem("progressList", JSON.stringify(updatedList));
+        }
+    </script>
+
+</body>
+</html>
