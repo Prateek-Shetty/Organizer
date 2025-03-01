@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 20px;
+            text-align: center;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: #fff;
+            transition: background 0.5s ease-in-out;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        select, button {
+            font-size: 1rem;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        select {
+            background-color: #fff;
+            color: #333;
+        }
+        button {
+            background-color: #ff6b6b;
+            color: white;
+        }
+        button:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+        .quiz-container {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 20px auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 1s ease-in-out;
+        }
+        .question {
+            margin-bottom: 15px;
+            text-align: left;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.5s ease-in-out forwards;
+        }
+        .result {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎯 Quiz [TEST YOUR KNOWLWDGE ON THE TOPICS ]</h1>
+
+    <label for="category">Select Category:</label>
+    <select id="category">
+        <option value="9">General Knowledge</option>
+        <option value="10">Entertainment: Books</option>
+        <option value="11">Entertainment: Film</option>
+        <option value="12">Entertainment: Music</option>
+        <option value="13">Entertainment: Musicals & Theatres</option>
+        <option value="14">Entertainment: Television</option>
+        <option value="15">Entertainment: Video Games</option>
+        <option value="16">Entertainment: Board Games</option>
+        <option value="17">Science & Nature</option>
+        <option value="18">Science: Computers</option>
+        <option value="19">Science: Mathematics</option>
+        <option value="20">Mythology</option>
+        <option value="21">Sports</option>
+        <option value="22">Geography</option>
+        <option value="23">History</option>
+        <option value="24">Politics</option>
+        <option value="25">Art</option>
+        <option value="26">Celebrities</option>
+        <option value="27">Animals</option>
+        <option value="28">Vehicles</option>
+        <option value="29">Entertainment: Comics</option>
+        <option value="30">Science: Gadgets</option>
+        <option value="31">Entertainment: Japanese Anime & Manga</option>
+        <option value="32">Entertainment: Cartoon & Animations</option>
+    </select>
+    
+    <button id="start-quiz">Start Quiz</button>
+
+    <div id="quizContainer" class="quiz-container"></div>
+
+    <center>
+        <button id="submitBtn" style="display: none;">Submit Quiz</button>
+        <button id="resetBtn" style="display: none; background-color: #4ecdc4;">Reset Quiz</button>
+    </center>
+
+    <div id="result"></div>
+
+    <script>
+        const quizContainer = document.getElementById("quizContainer");
+        const resultContainer = document.getElementById("result");
+        const submitBtn = document.getElementById("submitBtn");
+        const resetBtn = document.getElementById("resetBtn");
+        let correctAnswers = {};
+
+        document.getElementById("start-quiz").addEventListener("click", fetchQuestions);
+        submitBtn.addEventListener("click", submitQuiz);
+        resetBtn.addEventListener("click", resetQuiz);
+
+        async function fetchQuestions() {
+            const category = document.getElementById("category").value;
+            
+            quizContainer.innerHTML = "⏳ Loading questions...";
+            resultContainer.innerHTML = "";
+            submitBtn.style.display = "none";
+            resetBtn.style.display = "none";
+
+            try {
+                const response = await fetch("http://localhost:3000/get-mcq", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ category })
+                });
+
+                const questions = await response.json();
+                console.log("Questions received:", questions);
+
+                if (!Array.isArray(questions)) {
+                    quizContainer.innerHTML = "❌ Error fetching questions. Try again.";
+                    return;
+                }
+
+                correctAnswers = {};
+                quizContainer.innerHTML = "";
+                questions.forEach((q, index) => {
+                    correctAnswers[index] = q.correct_answer;
+                    const questionHTML = `
+                        <div class="question">
+                            <p><strong>${index + 1}. ${q.question}</strong></p>
+                            ${q.options.map(opt => `
+                                <label>
+                                    <input type="radio" name="q${index}" value="${opt}">
+                                    ${opt}
+                                </label><br>
+                            `).join("")}
+                        </div>
+                    `;
+                    quizContainer.innerHTML += questionHTML;
+                });
+
+                submitBtn.style.display = "block";
+            } catch (error) {
+                quizContainer.innerHTML = "❌ Failed to load questions.";
+            }
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            Object.keys(correctAnswers).forEach(index => {
+                const selectedOption = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selectedOption && selectedOption.value === correctAnswers[index]) {
+                    score++;
+                }
+            });
+
+            resultContainer.innerHTML = `<p class="result">🎉 Your Score: ${score} / 10</p>`;
+            resetBtn.style.display = "block";
+        }
+
+        function resetQuiz() {
+            location.reload(); // Reloads the page
+        }
+    </script>
+
+</body>
+</html>
