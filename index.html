@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
+   
     <!-- Navbar -->
     <nav class="navbar">
         <div class="logo">TimelyMind</div>
@@ -41,11 +41,16 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero">
-        
+    <div class="hero">
+        <video autoplay loop muted playsinline class="hero-video">
+            <source src="video.mp4" type="video/mp4">
+        </video>
         <div class="hero-overlay">
+            <h1 class="hero-title">Plan, Track, and Achieve!</h1>
+            <button class="start-btn" onclick="use()" >Start Planning</button>
         </div>
-    </section>
+    </div>
+    
 
     <!-- Study Content Cards -->
     <section class="cards-container">

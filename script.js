@@ -1,3 +1,7 @@
+function use(){
+    alert("Have a look at Explore and Advancement section!");
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     const formTitle = document.getElementById("form-title");
     const nameField = document.getElementById("name-field");
