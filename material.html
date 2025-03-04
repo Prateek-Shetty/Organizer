@@ -6,101 +6,109 @@
     <title>Study Hub</title>
     <style>
         * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
-body {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-}
-.container {
-    display: flex;
-    height: 50%;
-    width: 100%;
-    padding: 10px;
-}
-.box {
-    flex: 1;
-    margin: 10px;
-    padding: 20px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
-    overflow: auto;
-    min-height: 350px;
-}
-h3 {
-    text-align: center;
-    margin-bottom: 10px;
-}
-.input-container input, button {
-    width: 100%;
-    padding: 12px;
-    margin: 5px 0;
-    border-radius: 8px;
-    border: none;
-    font-size: 16px;
-}
-button {
-    background: #ff9800;
-    color: white;
-    cursor: pointer;
-}
-button:hover {
-    background: #e68900;
-}
-#videos, #booksSection {
-    height: 50%;
-}
-.video, .book {
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    margin: 5px 0;
-}
-.video a, .book {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-}
-.video a:hover {
-    text-decoration: underline;
-}
-/* Recent Subjects Styling */
-#pendingList li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 10px;
-    border-radius: 8px;
-    margin: 5px 0;
-}
-#pendingList li button {
-    background: transparent;
-    border: none;
-    color: rgb(244, 7, 35);
-    font-size: 18px;
-    cursor: pointer;
-    
-}
-
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            /* background: linear-gradient(135deg, #667eea, #764ba2); */
+            background: linear-gradient(135deg, #0c0d11, #000000);
+            color: white;
+            overflow: hidden;
+        }
+        .container {
+            display: flex;
+            height: 50%;
+            width: 100%;
+            padding: 10px;
+            opacity: 0.7;
+        }
+        .box {
+            flex: 1;
+            margin: 10px;
+            padding: 20px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+            overflow: auto;
+            min-height: 350px;
+            opacity: 0.7;
+        }
+        h3 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .input-container input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+        }
+        button {
+            background: #ff9800;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #e68900;
+        }
+        #videos, #booksSection {
+            height: 50%;
+        }
+        .video, .book {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            margin: 5px 0;
+        }
+        .video a, .book {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .video a:hover {
+            text-decoration: underline;
+        }
+        #pendingList li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 5px 0;
+        }
+        #pendingList li button {
+            background: transparent;
+            border: none;
+            color: rgb(244, 7, 35);
+            font-size: 18px;
+            cursor: pointer;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
-
+    <canvas id="mouseCanvas"></canvas>
     <div class="container">
         <div class="box" id="pendingWorks">
             <h3>Recent Subjects</h3>
             <ul id="pendingList"></ul>
         </div>
-
         <div class="box" id="formSection">
             <h3>Enter Subject</h3>
             <div class="input-container">
@@ -109,37 +117,30 @@ button:hover {
                 <button onclick="addSubject()">Enter</button>
             </div>
         </div>
-
         <div class="box" id="booksSection">
             <h3>Books</h3>
             <div id="booksList">Books will appear here...</div>
         </div>
     </div>
-
     <div class="box" id="videos">
         <h3>YouTube Videos</h3>
         <div id="videoList">Videos will appear here...</div>
     </div>
-
     <script>
         const API_BASE = "http://localhost:3000";
-
         async function addSubject() {
             const subject = document.getElementById("subjectInput").value;
             if (!subject) return alert("Enter a subject!");
-
             await fetch(API_BASE + "/add", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ subject })
             });
-
             loadPendingWorks();
             fetchVideos(subject);
             fetchBooks(subject);
             document.getElementById("subjectInput").value = "";
         }
-
         async function loadPendingWorks() {
             const res = await fetch(API_BASE + "/pending");
             const pendingWorks = await res.json();
@@ -147,12 +148,10 @@ button:hover {
                 (work, index) => `<li>${work} <button onclick="deleteWork(${index})">❌</button></li>`
             ).join("");
         }
-
         async function deleteWork(index) {
             await fetch(API_BASE + `/delete/${index}`, { method: "DELETE" });
             loadPendingWorks();
         }
-
         async function fetchVideos(query) {
             const res = await fetch(API_BASE + `/youtube?query=${query}`);
             const videos = await res.json();
@@ -162,7 +161,6 @@ button:hover {
                 </div>`
             ).join("");
         }
-
         async function fetchBooks(query) {
             const res = await fetch(API_BASE + `/books?query=${query}`);
             const books = await res.json();
@@ -170,12 +168,46 @@ button:hover {
                 book => `<div class="book">${book.title} - <small>${book.author}</small></div>`
             ).join("");
         }
-
-
-
         loadPendingWorks();
+        const canvas = document.getElementById("mouseCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particles = [];
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 5 + 2;
+                this.speedX = Math.random() * 3 - 1.5;
+                this.speedY = Math.random() * 3 - 1.5;
+                this.opacity = 1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.opacity -= 0.02;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        window.addEventListener("mousemove", (e) => {
+            particles.push(new Particle(e.x, e.y));
+        });
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, i) => {
+                p.update();
+                p.draw();
+                if (p.opacity <= 0) particles.splice(i, 1);
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
     </script>
-
 </body>
-</html> 
-
+</html>
