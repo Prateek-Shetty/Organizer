@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimelyMind - Smart Task Priority</title>
+    <style>
+        /* Navbar */
+        nav { background: #333; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        nav ul { list-style: none; margin: 0 auto; padding: 0; display: flex; justify-content: center; flex-grow: 1; }
+        nav ul li { margin: 0 20px; }
+        nav ul li a { color: white; text-decoration: none; font-size: 18px; }
+        nav div { flex-shrink: 0; }
+
+        /* Main Container */
+        .container { max-width: 600px; margin: 30px auto; text-align: center; }
+        input, select, button { padding: 10px; margin: 5px; width: 90%; }
+        .task-item { background: #f4f4f4; padding: 10px; margin: 10px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .priority-high { color: red; font-weight: bold; }
+        .priority-medium { color: orange; font-weight: bold; }
+        .priority-low { color: green; font-weight: bold; }
+        .delete-btn { background: red; color: white; border: none; padding: 5px; cursor: pointer; }
+
+        /* Footer */
+        footer { background: #333; color: white; text-align: center; padding: 10px; position: absolute; bottom: 0; width: 100%; }
+        footer a { color: white; text-decoration: none; margin: 10px; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <div><a href="#" style="color: white; font-size: 20px;">TimelyMind</a></div>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+        </ul>
+    </nav>
+
+    <!-- Smart Task Priority Section -->
+    <div class="container">
+        <h2>Smart Task Priority</h2>
+        <input type="text" id="taskName" placeholder="Enter task name...">
+        <select id="priorityLevel">
+            <option value="high">High Priority</option>
+            <option value="medium">Medium Priority</option>
+            <option value="low">Low Priority</option>
+        </select>
+        <button onclick="addTask()">Add Task</button>
+        <div id="taskList"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <a href="#">About</a> | 
+        <a href="#">Privacy</a> | 
+        <a href="#">Contact</a>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            loadTasks();
+        });
+
+        function addTask() {
+            let taskName = document.getElementById("taskName").value;
+            let priority = document.getElementById("priorityLevel").value;
+
+            if (!taskName) {
+                alert("Enter a valid task.");
+                return;
+            }
+
+            let task = { name: taskName, priority: priority };
+            saveTask(task);
+            displayTasks();
+        }
+
+        function saveTask(task) {
+            let taskList = JSON.parse(localStorage.getItem("taskList")) || [];
+            taskList.push(task);
+            localStorage.setItem("taskList", JSON.stringify(taskList));
+        }
+
+        function loadTasks() {
+            displayTasks();
+        }
+
+        function displayTasks() {
+            let taskList = JSON.parse(localStorage.getItem("taskList")) || [];
+            let taskContainer = document.getElementById("taskList");
+            taskContainer.innerHTML = "";
+
+            // Sort tasks by priority
+            taskList.sort((a, b) => {
+                const priorityOrder = { high: 1, medium: 2, low: 3 };
+                return priorityOrder[a.priority] - priorityOrder[b.priority];
+            });
+
+            taskList.forEach(task => {
+                let taskItem = document.createElement("div");
+                taskItem.className = "task-item";
+                taskItem.innerHTML = `
+                    <span>${task.name} - <span class="priority-${task.priority}">${task.priority.toUpperCase()}</span></span>
+                    <button class='delete-btn' onclick='deleteTask("${task.name}")'>Delete</button>`;
+                taskContainer.appendChild(taskItem);
+            });
+        }
+
+        function deleteTask(taskName) {
+            let taskList = JSON.parse(localStorage.getItem("taskList")) || [];
+            let updatedList = taskList.filter(task => task.name !== taskName);
+            localStorage.setItem("taskList", JSON.stringify(updatedList));
+            displayTasks();
+        }
+    </script>
+
+</body>
+</html>

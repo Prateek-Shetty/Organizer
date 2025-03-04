@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Timer</title>
+    <style>
+        /* Navbar */
+        nav { background: #333; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        nav ul { list-style: none; margin: 0 auto; padding: 0; display: flex; justify-content: center; flex-grow: 1; }
+        nav ul li { margin: 0 20px; }
+        nav ul li a { color: white; text-decoration: none; font-size: 18px; }
+        nav div { flex-shrink: 0; }
+
+        /* Countdown Container */
+        .container { max-width: 500px; margin: 50px auto; padding: 20px; background: #f4f4f4; border-radius: 10px; text-align: center; }
+        h2 { margin-bottom: 20px; }
+        .input-group { margin-bottom: 20px; }
+        input { width: 80%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px; background: blue; color: white; border: none; cursor: pointer; margin-top: 10px; }
+        button:hover { background: darkblue; }
+        #countdown { font-size: 24px; font-weight: bold; margin-top: 20px; }
+        .message { font-size: 18px; color: green; margin-top: 10px; }
+
+        /* Footer */
+        footer { background: #333; color: white; text-align: center; padding: 10px; position: absolute; bottom: 0; width: 100%; }
+        footer a { color: white; text-decoration: none; margin: 10px; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <div><a href="#" style="color: white; font-size: 20px;">TimelyMind</a></div>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+        </ul>
+    </nav>
+
+    <!-- Countdown Container -->
+    <div class="container">
+        <h2>Countdown Timer</h2>
+        <div class="input-group">
+            <label for="datetime">Set Date & Time:</label>
+            <input type="datetime-local" id="datetime">
+        </div>
+        <button onclick="startCountdown()">Start Countdown</button>
+        <button onclick="resetCountdown()">Reset</button>
+
+        <div id="countdown">00d : 00h : 00m : 00s</div>
+        <p class="message" id="message"></p>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <a href="#">About</a> | 
+        <a href="#">Privacy</a> | 
+        <a href="#">Contact</a>
+    </footer>
+
+    <script>
+        let countdownInterval;
+
+        // Request Notification Permission
+        function requestNotificationPermission() {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission !== "granted") {
+                        alert("Enable notifications for alerts!");
+                    }
+                });
+            }
+        }
+
+        function startCountdown() {
+            let targetDate = document.getElementById("datetime").value;
+            if (!targetDate) {
+                alert("Please select a date and time!");
+                return;
+            }
+
+            let targetTime = new Date(targetDate).getTime();
+            clearInterval(countdownInterval);
+
+            countdownInterval = setInterval(() => {
+                let now = new Date().getTime();
+                let timeLeft = targetTime - now;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById("countdown").innerHTML = "00d : 00h : 00m : 00s";
+                    document.getElementById("message").innerText = "Time's Up!";
+                    
+                    // Trigger Notification
+                    if ("Notification" in window && Notification.permission === "granted") {
+                        new Notification("⏳ Countdown Completed!", { body: "Time's Up!" });
+                    }
+
+                    return;
+                }
+
+                let days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                let hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                let minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                let seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                document.getElementById("countdown").innerHTML = `${days}d : ${hours}h : ${minutes}m : ${seconds}s`;
+                document.getElementById("message").innerText = "";
+            }, 1000);
+        }
+
+        function resetCountdown() {
+            clearInterval(countdownInterval);
+            document.getElementById("countdown").innerHTML = "00d : 00h : 00m : 00s";
+            document.getElementById("message").innerText = "";
+            document.getElementById("datetime").value = "";
+        }
+
+        // Request Notification Permission when page loads
+        document.addEventListener("DOMContentLoaded", requestNotificationPermission);
+    </script>
+
+</body>
+</html>
