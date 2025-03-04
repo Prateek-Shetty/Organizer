@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Countdown Timer</title>
     <style>
+        /* General Page Styling */
+        body { 
+            background: #121212; 
+            color: white; 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            overflow: hidden;
+        }
+        
         /* Navbar */
         nav { background: #333; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         nav ul { list-style: none; margin: 0 auto; padding: 0; display: flex; justify-content: center; flex-grow: 1; }
@@ -13,13 +23,46 @@
         nav div { flex-shrink: 0; }
 
         /* Countdown Container */
-        .container { max-width: 500px; margin: 50px auto; padding: 20px; background: #f4f4f4; border-radius: 10px; text-align: center; }
-        h2 { margin-bottom: 20px; }
+        .container { max-width: 500px; margin: 50px auto; padding: 20px; background: #222; border-radius: 10px; text-align: center; box-shadow: 0 0 10px rgba(255, 0, 0, 0.54); }
+        h2 { margin-bottom: 20px; color: white; }
         .input-group { margin-bottom: 20px; }
+        label { color: white; }
         input { width: 80%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
-        button { padding: 10px; background: blue; color: white; border: none; cursor: pointer; margin-top: 10px; }
-        button:hover { background: darkblue; }
-        #countdown { font-size: 24px; font-weight: bold; margin-top: 20px; }
+        button { padding: 10px; background: blue; color: white; border: none; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        button:hover { background: darkblue; transform: scale(1.05); }
+        
+      
+        /* Countdown Timer Fire Effect */
+        #countdown { 
+            font-size: 28px; 
+            font-weight: bold; 
+            margin-top: 20px; 
+            color: #ff4500; 
+            text-shadow: 0 0 10px rgba(255, 69, 0, 0.8), 0 0 20px rgba(255, 0, 0, 0.6);
+            animation: fireGlow 1.5s infinite alternate;
+        }
+        
+        @keyframes fireGlow {
+            0% { text-shadow: 0 0 15px rgba(255, 69, 0, 0.8), 0 0 25px rgba(255, 0, 0, 0.6); }
+            100% { text-shadow: 0 0 20px rgba(255, 165, 0, 1), 0 0 30px rgba(255, 69, 0, 0.8); }
+        }
+
+        /* Black Fire Effect on Mouse */
+        .fire-mouse {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, rgba(0,0,0,1) 10%, rgba(30,30,30,0.6) 50%, rgba(0,0,0,0) 80%);
+            pointer-events: none;
+            animation: fireFade 0.5s linear forwards;
+            border-radius: 50%;
+        }
+
+        @keyframes fireFade {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
         .message { font-size: 18px; color: green; margin-top: 10px; }
 
         /* Footer */
@@ -61,7 +104,6 @@
     <script>
         let countdownInterval;
 
-        // Request Notification Permission
         function requestNotificationPermission() {
             if ("Notification" in window) {
                 Notification.requestPermission().then(permission => {
@@ -90,12 +132,9 @@
                     clearInterval(countdownInterval);
                     document.getElementById("countdown").innerHTML = "00d : 00h : 00m : 00s";
                     document.getElementById("message").innerText = "Time's Up!";
-                    
-                    // Trigger Notification
                     if ("Notification" in window && Notification.permission === "granted") {
                         new Notification("⏳ Countdown Completed!", { body: "Time's Up!" });
                     }
-
                     return;
                 }
 
@@ -116,9 +155,14 @@
             document.getElementById("datetime").value = "";
         }
 
-        // Request Notification Permission when page loads
-        document.addEventListener("DOMContentLoaded", requestNotificationPermission);
+        document.addEventListener("mousemove", function(e) {
+            let fire = document.createElement("div");
+            fire.classList.add("fire-mouse");
+            fire.style.top = `${e.clientY}px`;
+            fire.style.left = `${e.clientX}px`;
+            document.body.appendChild(fire);
+            setTimeout(() => fire.remove(), 500);
+        });
     </script>
-
 </body>
 </html>
