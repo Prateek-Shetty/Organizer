@@ -5,27 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TimelyMind - Reminders</title>
     <style>
-        a{
-         color: white; 
-         font-size: 20px;
-        }
+       /* General Page Styles */
+body {
+    background: linear-gradient(135deg, #1a1a1a, #292929, #111); /* Dark gradient background */
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevents unwanted scrolling */
+}
 
-        /* Navbar */
-        nav { background: #333; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        nav ul { list-style: none; margin: 0; padding: 0; display: flex; justify-content: center; flex-grow:1;}
-        nav ul li { margin-right: 20px; }
-        nav ul li a { color: white; text-decoration: none; font-size: 18px; }
-        nav div {flex-shrink: 0;}
+/* Navbar */
+nav { 
+    background: rgba(20, 20, 20, 0.9); /* Slight transparency for depth */
+    padding: 15px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+}
+nav ul { 
+    list-style: none; 
+    margin: 0; 
+    padding: 0; 
+    display: flex; 
+    justify-content: center; 
+    flex-grow:1;
+}
+nav ul li { margin-right: 20px; }
+nav ul li a { 
+    color: white; 
+    text-decoration: none; 
+    font-size: 18px; 
+    transition: color 0.3s ease-in-out;
+}
+nav ul li a:hover { color: #ff6600; } /* Orange glow effect on hover */
+nav div { flex-shrink: 0; }
 
-        /* Main Container */
-        .container { max-width: 500px; margin: 30px auto; text-align: center; }
-        input, button { padding: 10px; margin: 5px; width: 90%; }
-        .reminder-item { background: #f4f4f4; padding: 10px; margin: 10px; border-radius: 5px; }
-        .delete-btn { background: red; color: white; border: none; padding: 5px; cursor: pointer; }
-        
-        /* Footer */
-        footer { background: #333; color: white; text-align: center; padding: 10px; position: absolute; bottom: 0; width: 100%; }
-        footer a { color: white; text-decoration: none; margin: 10px; }
+/* Main Container */
+.container { 
+    max-width: 500px; 
+    margin: 50px auto; 
+    text-align: center; 
+    background: rgba(40, 40, 40, 0.9); /* Subtle dark background */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+}
+input, button { 
+    padding: 10px; 
+    margin: 5px; 
+    width: 90%;
+    border-radius: 5px;
+    border: none;
+}
+input { background: #222; color: white; }
+button { background: #ff6600; color: white; cursor: pointer; }
+button:hover { background: #ff3300; }
+
+/* Reminder Items */
+.reminder-item { 
+    background: #333; 
+    padding: 10px; 
+    margin: 10px; 
+    border-radius: 5px;
+    color: white;
+}
+.delete-btn { 
+    background: red; 
+    color: white; 
+    border: none; 
+    padding: 5px; 
+    cursor: pointer; 
+}
+.delete-btn:hover { background: darkred; }
+
+/* Footer */
+footer { 
+    background: rgba(20, 20, 20, 0.9); 
+    color: white; 
+    text-align: center; 
+    padding: 10px; 
+    position: absolute; 
+    bottom: 0; 
+    width: 100%;
+}
+footer a { 
+    color: white; 
+    text-decoration: none; 
+    margin: 10px; 
+    transition: color 0.3s ease-in-out;
+}
+footer a:hover { color: #ff6600; }
+
+/* Black Fire Effect */
+.black-fire {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.8) 10%, rgba(0, 0, 0, 0) 80%);
+    pointer-events: none;
+    filter: blur(12px);
+    animation: flicker 0.2s infinite alternate;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes flicker {
+    0% { opacity: 0.8; transform: scale(1.2); filter: blur(15px); }
+    100% { opacity: 0.4; transform: scale(1); filter: blur(10px); }
+}
+
     </style>
 </head>
 <body>
@@ -42,7 +131,7 @@
     <div class="container">
         <h2>Set a Reminder</h2>
         <input type="text" id="reminderText" placeholder="Enter reminder...">
-        <input type="datetime-local" id="reminderTime" placeholder="date plz">
+        <input type="datetime-local" id="reminderTime">
         <button onclick="setReminder()">Add Reminder</button>
         <div id="reminderList"></div>
     </div>
@@ -53,6 +142,9 @@
         <a href="#">Privacy</a> | 
         <a href="#">Contact</a>
     </footer>
+
+    <!-- Black Fire Effect -->
+    <div class="black-fire" id="blackFire"></div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -114,6 +206,13 @@
             let updatedReminders = reminders.filter(rem => rem.text !== text || rem.time !== time);
             localStorage.setItem("reminders", JSON.stringify(updatedReminders));
         }
+
+        // Black Fire Mouse Effect
+        document.addEventListener("mousemove", (e) => {
+            let blackFire = document.getElementById("blackFire");
+            blackFire.style.left = e.pageX + "px";
+            blackFire.style.top = e.pageY + "px";
+        });
     </script>
 
 </body>

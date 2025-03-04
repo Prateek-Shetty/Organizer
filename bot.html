@@ -3,171 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini AI Chatbot</title>
+    <title>Quiz App</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
+            font-family: 'Poppins', sans-serif;
+            margin: 20px;
             text-align: center;
-            margin: 0;
+            background: linear-gradient(to right, #1b1b1b, #3a3a3a);
+            color: #fff;
+            transition: background 0.5s ease-in-out;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        select, button {
+            font-size: 1rem;
+            padding: 12px;
+            margin: 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s, box-shadow 0.3s;
+        }
+        select {
+            background-color: #fff;
+            color: #333;
+        }
+        button {
+            background-color: #ff6b6b;
+            color: white;
+            box-shadow: 0 4px 10px rgba(255, 0, 0, 0.5);
+        }
+        button:hover {
+            transform: scale(1.1);
+            background-color: #ff4757;
+            box-shadow: 0 6px 15px rgba(255, 0, 0, 0.8);
+        }
+        .quiz-container {
+            background: rgba(255, 255, 255, 0.2);
             padding: 20px;
-            overflow: hidden;
-            cursor: none;
-        }
-
-        #chatbox {
-            width: 50%;
+            border-radius: 10px;
+            max-width: 600px;
             margin: 20px auto;
-            padding: 15px;
-            background-color: #1e1e2e;
-            border-radius: 10px;
-            height: 400px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.1);
-            transition: transform 0.3s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 1s ease-in-out;
         }
-
-        .message {
-            padding: 10px;
-            border-radius: 10px;
-            margin: 5px 0;
-            max-width: 80%;
-            word-wrap: break-word;
-            display: inline-block;
+        .question {
+            margin-bottom: 15px;
+            text-align: left;
             opacity: 0;
-            animation: fadeIn 0.5s forwards;
+            transform: translateY(20px);
+            animation: fadeUp 0.5s ease-in-out forwards;
         }
-
+        .result {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 20px;
+            animation: bounceIn 0.8s ease-in-out;
+        }
+        #submitBtn, #resetBtn {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        .user {
-            background-color: #0da37f;
-            align-self: flex-end;
-            text-align: right;
-        }
-
-        .bot {
-            background-color: #565869;
-            align-self: flex-start;
-            text-align: left;
-        }
-
-        input {
-            width: 40%;
-            padding: 12px;
-            border: none;
-            border-radius: 5px;
-            margin-right: 10px;
-            background-color: #40414F;
-            color: white;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        input:focus {
-            background-color: #55576a;
-            transform: scale(1.05);
-        }
-
-        button {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #0da37f;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        button:hover {
-            background-color: #08966b;
-            transform: scale(1.1);
-        }
-
-        /* Cursor Fire Effect */
-        .cursor {
-            position: absolute;
-            width: 15px;
-            height: 15px;
-            background: radial-gradient(circle, rgba(255,69,0,1) 0%, rgba(255,140,0,0) 80%);
-            border-radius: 50%;
-            pointer-events: none;
-            mix-blend-mode: lighten;
-            transition: transform 0.1s linear;
-            box-shadow: 0 0 10px rgba(255, 69, 0, 0.7);
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 <body>
-    <h1>Gemini AI Chatbot</h1>
-    <div id="chatbox"></div>
-    <input type="text" id="userInput" placeholder="Type your message...">
-    <button onclick="sendMessage()">Send</button>
-    <div id="cursorEffect"></div>
+    <h1>🎯 Quiz App</h1>
+
+    <label for="category">Select Category:</label>
+    <select id="category">
+        <option value="9">General Knowledge</option>
+        <option value="10">Entertainment: Books</option>
+        <option value="11">Entertainment: Film</option>
+        <option value="12">Entertainment: Music</option>
+    </select>
+    
+    <button id="start-quiz">Start Quiz</button>
+
+    <div id="quizContainer" class="quiz-container"></div>
+
+    <center>
+        <button id="submitBtn">Submit Quiz</button>
+        <button id="resetBtn" style="background-color: #4ecdc4;">Reset Quiz</button>
+    </center>
+
+    <div id="result"></div>
 
     <script>
-        document.getElementById("userInput").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                sendMessage();
-            }
-        });
+        const quizContainer = document.getElementById("quizContainer");
+        const resultContainer = document.getElementById("result");
+        const submitBtn = document.getElementById("submitBtn");
+        const resetBtn = document.getElementById("resetBtn");
+        let correctAnswers = {};
 
-        async function sendMessage() {
-            const userInput = document.getElementById("userInput");
-            const chatbox = document.getElementById("chatbox");
+        document.getElementById("start-quiz").addEventListener("click", fetchQuestions);
+        submitBtn.addEventListener("click", submitQuiz);
+        resetBtn.addEventListener("click", resetQuiz);
 
-            if (!userInput.value.trim()) return;
-
-            const userMessage = document.createElement("p");
-            userMessage.classList.add("message", "user");
-            userMessage.innerHTML = `<strong>You:</strong> ${userInput.value}`;
-            chatbox.appendChild(userMessage);
+        async function fetchQuestions() {
+            const category = document.getElementById("category").value;
+            quizContainer.innerHTML = "⏳ Loading questions...";
+            resultContainer.innerHTML = "";
+            submitBtn.style.display = "none";
+            resetBtn.style.display = "none";
 
             try {
-                const response = await fetch("http://localhost:3000/generate", {
+                const response = await fetch("http://localhost:3000/get-mcq", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ prompt: userInput.value })
+                    body: JSON.stringify({ category })
+                });
+                const questions = await response.json();
+                if (!Array.isArray(questions)) {
+                    quizContainer.innerHTML = "❌ Error fetching questions. Try again.";
+                    return;
+                }
+                correctAnswers = {};
+                quizContainer.innerHTML = "";
+                questions.forEach((q, index) => {
+                    correctAnswers[index] = q.correct_answer;
+                    const questionHTML = `
+                        <div class="question">
+                            <p><strong>${index + 1}. ${q.question}</strong></p>
+                            ${q.options.map(opt => `
+                                <label>
+                                    <input type="radio" name="q${index}" value="${opt}">
+                                    ${opt}
+                                </label><br>
+                            `).join("")}
+                        </div>
+                    `;
+                    quizContainer.innerHTML += questionHTML;
                 });
 
-                const data = await response.json();
-                const botMessage = document.createElement("p");
-                botMessage.classList.add("message", "bot");
-                botMessage.innerHTML = `<strong>Bot:</strong> ${data.response}`;
-                chatbox.appendChild(botMessage);
+                submitBtn.style.display = "block";
             } catch (error) {
-                const errorMessage = document.createElement("p");
-                errorMessage.classList.add("message", "bot");
-                errorMessage.innerHTML = `<strong>Error:</strong> Unable to fetch response.`;
-                chatbox.appendChild(errorMessage);
-                console.error(error);
+                quizContainer.innerHTML = "❌ Failed to load questions.";
             }
-
-            userInput.value = "";
-            chatbox.scrollTop = chatbox.scrollHeight;
         }
 
-        // Cursor Fire Effect
-        document.addEventListener("mousemove", function(e) {
-            let cursor = document.createElement("div");
-            cursor.classList.add("cursor");
-            document.body.appendChild(cursor);
-            cursor.style.left = e.pageX + "px";
-            cursor.style.top = e.pageY + "px";
-            cursor.style.transform = `translate(-50%, -50%) scale(${Math.random() * 2})`;
+        function submitQuiz() {
+            let score = 0;
+            Object.keys(correctAnswers).forEach(index => {
+                const selectedOption = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selectedOption && selectedOption.value === correctAnswers[index]) {
+                    score++;
+                }
+            });
 
-            setTimeout(() => {
-                cursor.remove();
-            }, 300);
-        });
+            resultContainer.innerHTML = `<p class="result">🎉 Your Score: ${score} / 10</p>`;
+            resetBtn.style.display = "block";
+        }
+
+        function resetQuiz() {
+            location.reload();
+        }
     </script>
 </body>
 </html>

@@ -9,34 +9,29 @@
             font-family: 'Poppins', sans-serif;
             margin: 20px;
             text-align: center;
-            background: linear-gradient(to right, #4facfe, #00f2fe);
+            background: linear-gradient(to right, #1b1b1b, #3a3a3a);
             color: #fff;
             transition: background 0.5s ease-in-out;
+            cursor: none; /* Hide default cursor */
         }
         h1 {
-            font-size: 2rem;
+            font-size: 2.5rem;
             margin-bottom: 20px;
+            animation: fadeIn 1s ease-in-out;
         }
         select, button {
             font-size: 1rem;
-            padding: 10px;
+            padding: 12px;
             margin: 10px;
-            border-radius: 5px;
+            border-radius: 8px;
             border: none;
             cursor: pointer;
-            transition: transform 0.2s ease-in-out;
-        }
-        select {
-            background-color: #fff;
-            color: #333;
-        }
-        button {
-            background-color: #ff6b6b;
-            color: white;
+            transition: transform 0.3s ease-in-out, background 0.3s, box-shadow 0.3s;
         }
         button:hover {
-            transform: scale(1.05);
-            opacity: 0.9;
+            transform: scale(1.1);
+            background-color: #ff4757;
+            box-shadow: 0 6px 15px rgba(255, 0, 0, 0.8);
         }
         .quiz-container {
             background: rgba(255, 255, 255, 0.2);
@@ -56,11 +51,31 @@
             animation: fadeUp 0.5s ease-in-out forwards;
         }
         .result {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             font-weight: bold;
             margin-top: 20px;
-            animation: fadeIn 1s ease-in-out;
+            animation: bounceIn 0.8s ease-in-out;
         }
+        #submitBtn, #resetBtn {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* Mouse Animation */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 0, 0, 0.8);
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-radius: 50%;
+            pointer-events: none;
+            transition: transform 0.1s ease-out, opacity 0.2s ease-in-out;
+            mix-blend-mode: difference;
+        }
+
+        /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -69,11 +84,18 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
+    <!-- Custom Mouse Cursor -->
+    <div class="cursor" id="cursor"></div>
 
-    <h1>🎯 Quiz [TEST YOUR KNOWLWDGE ON THE TOPICS ]</h1>
+    <h1>🎯 Quiz App</h1>
 
     <label for="category">Select Category:</label>
     <select id="category">
@@ -81,26 +103,6 @@
         <option value="10">Entertainment: Books</option>
         <option value="11">Entertainment: Film</option>
         <option value="12">Entertainment: Music</option>
-        <option value="13">Entertainment: Musicals & Theatres</option>
-        <option value="14">Entertainment: Television</option>
-        <option value="15">Entertainment: Video Games</option>
-        <option value="16">Entertainment: Board Games</option>
-        <option value="17">Science & Nature</option>
-        <option value="18">Science: Computers</option>
-        <option value="19">Science: Mathematics</option>
-        <option value="20">Mythology</option>
-        <option value="21">Sports</option>
-        <option value="22">Geography</option>
-        <option value="23">History</option>
-        <option value="24">Politics</option>
-        <option value="25">Art</option>
-        <option value="26">Celebrities</option>
-        <option value="27">Animals</option>
-        <option value="28">Vehicles</option>
-        <option value="29">Entertainment: Comics</option>
-        <option value="30">Science: Gadgets</option>
-        <option value="31">Entertainment: Japanese Anime & Manga</option>
-        <option value="32">Entertainment: Cartoon & Animations</option>
     </select>
     
     <button id="start-quiz">Start Quiz</button>
@@ -108,8 +110,8 @@
     <div id="quizContainer" class="quiz-container"></div>
 
     <center>
-        <button id="submitBtn" style="display: none;">Submit Quiz</button>
-        <button id="resetBtn" style="display: none; background-color: #4ecdc4;">Reset Quiz</button>
+        <button id="submitBtn">Submit Quiz</button>
+        <button id="resetBtn" style="background-color: #4ecdc4;">Reset Quiz</button>
     </center>
 
     <div id="result"></div>
@@ -119,6 +121,7 @@
         const resultContainer = document.getElementById("result");
         const submitBtn = document.getElementById("submitBtn");
         const resetBtn = document.getElementById("resetBtn");
+        const cursor = document.getElementById("cursor");
         let correctAnswers = {};
 
         document.getElementById("start-quiz").addEventListener("click", fetchQuestions);
@@ -127,7 +130,6 @@
 
         async function fetchQuestions() {
             const category = document.getElementById("category").value;
-            
             quizContainer.innerHTML = "⏳ Loading questions...";
             resultContainer.innerHTML = "";
             submitBtn.style.display = "none";
@@ -139,15 +141,11 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ category })
                 });
-
                 const questions = await response.json();
-                console.log("Questions received:", questions);
-
                 if (!Array.isArray(questions)) {
                     quizContainer.innerHTML = "❌ Error fetching questions. Try again.";
                     return;
                 }
-
                 correctAnswers = {};
                 quizContainer.innerHTML = "";
                 questions.forEach((q, index) => {
@@ -186,9 +184,19 @@
         }
 
         function resetQuiz() {
-            location.reload(); // Reloads the page
+            location.reload();
         }
-    </script>
 
+        // Mouse Cursor Animation
+        document.addEventListener("mousemove", (e) => {
+            cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px) scale(1.2)`;
+            cursor.style.opacity = "1";
+        });
+
+        document.addEventListener("mouseleave", () => {
+            cursor.style.opacity = "0";
+        });
+
+    </script>
 </body>
 </html>

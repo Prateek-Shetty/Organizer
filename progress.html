@@ -5,31 +5,203 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TimelyMind - Progress Tracker</title>
     <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            cursor: none;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e1e2e, #3a3a50);
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Custom Mouse Cursor */
+        .cursor, .cursor-glow {
+            position: fixed;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Cursor Center Dot */
+        .cursor {
+            width: 15px;
+            height: 15px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Surrounding Glow Effect */
+        .cursor-glow {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            animation: pulse 1s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.6; }
+            100% { transform: scale(1.5); opacity: 0.2; }
+        }
+
         /* Navbar */
-        nav { background: #333; padding: 15px; display: flex; justify-content: center; align-items: center; }
-        nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-grow: 1; justify-content: center;}
-        nav ul li { margin-right: 20px; }
-        nav ul li a { color: white; text-decoration: none; font-size: 18px; }
-        nav div {flex-shrink: 0;}
-        
-        /* Main Container */
-        .container { max-width: 600px; margin: 30px auto; text-align: center; }
-        input, button { padding: 10px; margin: 5px; width: 90%; }
-        .progress-item { background: #f4f4f4; padding: 10px; margin: 10px; border-radius: 5px; }
-        .progress-bar { height: 20px; background: #ddd; width: 100%; border-radius: 5px; position: relative; }
-        .progress-fill { height: 100%; background: green; border-radius: 5px; width: 0%; text-align: center; color: white; }
-        .delete-btn { background: red; color: white; border: none; padding: 5px; cursor: pointer; }
+        nav {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        nav ul li {
+            margin-right: 20px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        nav div {
+            font-size: 20px;
+            color: white;
+        }
+
+        /* Progress Container */
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            flex-grow: 1;
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            width: 90%;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus {
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        button {
+            cursor: pointer;
+            background: #4caf50;
+            color: white;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+        }
+
+        /* Progress Items */
+        .progress-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: 0.3s ease-in-out;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: #ddd;
+            width: 100%;
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: green;
+            border-radius: 5px;
+            text-align: center;
+            color: white;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .delete-btn, .edit-btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            margin: 5px;
+            transition: 0.3s ease;
+        }
+        .edit-btn {
+            background: blue;
+        }
+        .delete-btn:hover {
+            background: darkred;
+        }
+        .edit-btn:hover {
+            background: darkblue;
+        }
 
         /* Footer */
-        footer { background: #333; color: white; text-align: center; padding: 10px; position: absolute; bottom: 0; width: 100%; }
-        footer a { color: white; text-decoration: none; margin: 10px; }
+        footer {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            width: 100%;
+            margin-top: auto;
+        }
+        footer a {
+            color: white;
+            text-decoration: none;
+            margin: 10px;
+        }
     </style>
 </head>
 <body>
 
+    <div class="cursor"></div>
+    <div class="cursor-glow"></div>
+
     <!-- Navbar -->
     <nav>
-        <div><a href="#" style="color: white; font-size: 20px;">TimelyMind</a></div>
+        <div>TimelyMind</div>
         <ul>
             <li><a href="index.html">Home</a></li>
         </ul>
@@ -59,11 +231,12 @@
         function addProgress() {
             let taskName = document.getElementById("taskName").value;
             let progressValue = document.getElementById("progressValue").value;
+
             if (!taskName || progressValue === "" || progressValue < 0 || progressValue > 100) {
                 alert("Enter a valid task and progress (0-100%).");
                 return;
             }
-            
+
             let progress = { task: taskName, value: progressValue };
             saveProgress(progress);
             displayProgress(progress);
@@ -75,30 +248,15 @@
             localStorage.setItem("progressList", JSON.stringify(progressList));
         }
 
-        function loadProgress() {
-            let progressList = JSON.parse(localStorage.getItem("progressList")) || [];
-            progressList.forEach(progress => displayProgress(progress));
-        }
+        document.addEventListener("mousemove", (e) => {
+            let cursor = document.querySelector(".cursor");
+            let glow = document.querySelector(".cursor-glow");
 
-        function displayProgress(progress) {
-            let progressList = document.getElementById("progressList");
-            let progressItem = document.createElement("div");
-            progressItem.className = "progress-item";
-            progressItem.innerHTML = `
-                <strong>${progress.task}</strong> - ${progress.value}% 
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${progress.value}%;"></div>
-                </div>
-                <button class='delete-btn' onclick='deleteProgress(this, "${progress.task}")'>Delete</button>`;
-            progressList.appendChild(progressItem);
-        }
-
-        function deleteProgress(button, taskName) {
-            button.parentElement.remove();
-            let progressList = JSON.parse(localStorage.getItem("progressList")) || [];
-            let updatedList = progressList.filter(progress => progress.task !== taskName);
-            localStorage.setItem("progressList", JSON.stringify(updatedList));
-        }
+            cursor.style.left = e.clientX + "px";
+            cursor.style.top = e.clientY + "px";
+            glow.style.left = e.clientX + "px";
+            glow.style.top = e.clientY + "px";
+        });
     </script>
 
 </body>

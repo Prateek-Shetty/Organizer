@@ -6,60 +6,135 @@
     <title>Timetable Generator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background: linear-gradient(to right, #6a11cb, #2575fc);
-            color: white;
-            margin: 0;
-            padding: 20px;
-        }
-        
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
-            display: inline-block;
-            text-align: left;
-            color: black;
-        }
+        /* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    color: white;
+    margin: 0;
+    padding: 20px;
+    overflow: hidden;
+    cursor: none; /* Hide default cursor */
+}
 
-        label, select, button, input {
-            font-size: 16px;
-            margin: 5px;
-        }
+/* Container Box */
+.container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+    display: inline-block;
+    text-align: left;
+    color: black;
+    animation: fadeIn 0.8s ease-in-out;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
+/* Labels, Select, and Input Fields */
+label, select, button, input {
+    font-size: 16px;
+    margin: 5px;
+}
 
-        th, td {
-            border: 1px solid black;
-            padding: 10px;
-            text-align: center;
-            background: #f0f0f0;
-        }
+input {
+    padding: 8px;
+    border: 2px solid #2575fc;
+    border-radius: 5px;
+    transition: 0.3s ease-in-out;
+}
 
-        th {
-            background: #2575fc;
-            color: white;
-        }
+input:focus {
+    border-color: #6a11cb;
+    box-shadow: 0px 0px 8px rgba(106, 17, 203, 0.6);
+}
 
-        button {
-            padding: 10px 15px;
-            background: #2575fc;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+/* Timetable Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    opacity: 0;
+    animation: fadeIn 1s ease-in-out forwards;
+}
 
-        button:hover {
-            background: #6a11cb;
-        }
+th, td {
+    border: 1px solid black;
+    padding: 10px;
+    text-align: center;
+    background: rgba(240, 240, 240, 0.9);
+    transition: 0.3s ease-in-out;
+}
+
+th {
+    background: #2575fc;
+    color: white;
+}
+
+td {
+    cursor: pointer;
+}
+
+td:hover {
+    background: rgba(106, 17, 203, 0.2);
+    transform: scale(1.05);
+}
+
+/* Buttons */
+button {
+    padding: 10px 15px;
+    background: #2575fc;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+    box-shadow: 0px 4px 10px rgba(37, 117, 252, 0.4);
+}
+
+button:hover {
+    background: #6a11cb;
+    transform: scale(1.1);
+    box-shadow: 0px 6px 15px rgba(106, 17, 203, 0.5);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Cursor Effect */
+.cursor {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 30%, rgba(255, 255, 255, 0) 80%);
+    border-radius: 50%;
+    pointer-events: none;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease-out;
+}
+
+.cursor-trail {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 30%, rgba(255, 255, 255, 0) 80%);
+    border-radius: 50%;
+    pointer-events: none;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    opacity: 0.7;
+    transition: transform 0.15s ease-out, opacity 0.3s ease-out;
+}
+
     </style>
 </head>
 <body>
@@ -180,6 +255,40 @@
 
             doc.save("timetable.pdf");
         }
+
+        document.addEventListener("DOMContentLoaded", () => {
+    const cursor = document.createElement("div");
+    cursor.classList.add("cursor");
+    document.body.appendChild(cursor);
+
+    const trail = document.createElement("div");
+    trail.classList.add("cursor-trail");
+    document.body.appendChild(trail);
+
+    document.addEventListener("mousemove", (e) => {
+        cursor.style.left = `${e.clientX}px`;
+        cursor.style.top = `${e.clientY}px`;
+
+        trail.style.left = `${e.clientX}px`;
+        trail.style.top = `${e.clientY}px`;
+        trail.style.opacity = "1";
+
+        setTimeout(() => {
+            trail.style.opacity = "0";
+        }, 300);
+    });
+
+    document.addEventListener("mouseleave", () => {
+        cursor.style.opacity = "0";
+        trail.style.opacity = "0";
+    });
+
+    document.addEventListener("mouseenter", () => {
+        cursor.style.opacity = "1";
+        trail.style.opacity = "0.7";
+    });
+});
+
     </script>
 
 </body>

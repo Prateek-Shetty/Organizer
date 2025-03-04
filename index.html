@@ -4,74 +4,283 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TimelyMind - Home</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            cursor: none;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e1e2e, #3a3a50);
+            color: white;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background Video */
+        .bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.5; /* Adjust transparency */
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: width 0.1s ease, height 0.1s ease;
+            z-index: 999;
+        }
+
+        /* New Glow Effect */
+        .cursor-glow {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease-out, opacity 0.2s;
+            z-index: 998;
+        }
+
+        /* Ripple Effect */
+        .cursor-ripple {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            position: absolute;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            animation: ripple 0.6s linear infinite;
+            pointer-events: none;
+            z-index: 997;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* Hover Effect */
+        .cursor.hover {
+            width: 15px;
+            height: 15px;
+        }
+
+        .cursor-glow.hover {
+            width: 40px;
+            height: 40px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.8);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #ffca2c;
+        }
+
+        .auth-buttons a {
+            padding: 8px 12px;
+            background: #ffca2c;
+            color: black;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        .auth-buttons a:hover {
+            background: #ff5733;
+            color: white;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .start-btn {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #ff6b6b, #f06595);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+            border-radius: 10px;
+        }
+
+        .start-btn:hover {
+            background: linear-gradient(45deg, #f06595, #ff6b6b);
+        }
+
+        /* Cards Section */
+        .cards-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 50px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.4);
+        }
+
+        .footer {
+            display: flex;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+        }
+
+        .footer a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .cards-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
 </head>
 <body>
-   
-    <!-- Navbar -->
+    <video class="bg-video" autoplay loop muted>
+        <source src="./video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="cursor"></div>
+    <div class="cursor-glow"></div>
+    <div class="cursor-ripple"></div>
+
     <nav class="navbar">
         <div class="logo">TimelyMind</div>
         <ul class="nav-links">
             <li><a href="#">Home</a></li>
-            <li class="dropdown">
-                <a href="#">Explore ▾</a>
-                <ul class="dropdown-menu">
-                    <li><a href="table.html">Time table</a></li>
-                    <li><a href="task-track.html">Task Tracker</a></li>
-                    <li><a href="Reminder.html">Reminder</a></li>
-                    <li><a href="progress.html">Progress Tracker</a></li>
-                    <li><a href="board.html">Smart Editing Board</a></li>
-                </ul>
-            </li>
-            <li class="dropdown">
-                <a href="#">Advancement ▾</a>
-                <ul class="dropdown-menu">
-                    <li><a href="bot.html">AI Chat Bot</a></li>
-                    <li><a href="priority.html">Smart Task Priority</a></li>
-                    <li><a href="pomodoro.html">Pomodoro Timer</a></li>
-                    <li><a href="count.html">Countdown</a></li>
-                    <li><a href="material.html">Group Studies</a></li>
-                    <li><a href="quiz.html">Quiz</a></li>
-                </ul>
-            </li>
+            <li><a href="#">Explore</a></li>
+            <li><a href="#">Advancement</a></li>
         </ul>
         <div class="auth-buttons">
-            <a href="sign.html" class="login">Login / Sign Up</a>
+            <a href="sign.html">Login / Sign Up</a>
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <div class="hero">
-        <video autoplay loop muted playsinline class="hero-video">
-            <source src="video.mp4" type="video/mp4">
-        </video>
-        <div class="hero-overlay">
-            <h1 class="hero-title">Plan, Track, and Achieve!</h1>
-            <button class="start-btn" onclick="use()" >Start Planning</button>
-        </div>
+        <h1>Plan, Track, and Achieve!</h1>
+        <button class="start-btn" onclick="use()">Start Planning</button>
     </div>
-    
 
-    <!-- Study Content Cards -->
-    <section class="cards-container">
-        <div class="card">📚 Study Techniques
-            <div class="card-in">The Pomodoro Technique enhances focus by breaking study time into 25-minute sessions with 5-minute breaks. After four cycles, take a 15–30 minute break. This boosts retention and prevents burnout. Combine it with active recall and summarization for better learning. Minimize distractions, stay consistent, and track progress for effective studying!</div>
-        </div>
-        <div class="card">⏳ Time Management
-            <div class="card-in">Effective time management boosts productivity by prioritizing tasks and setting clear goals. Use techniques like the Eisenhower Matrix to focus on urgent and important tasks. Break work into manageable chunks, set deadlines, and avoid procrastination. Utilize planners, timers, or apps to stay organized. Consistency and discipline lead to long-term success!</div>
-        </div>
-        <div class="card">🎯 Productivity Hacks
-            <div class="card-in">Boost productivity with smart hacks like the 80/20 rule—focus on tasks with the most impact. Use the two-minute rule to complete quick tasks immediately. Batch similar tasks, minimize distractions, and take strategic breaks. Leverage tools like planners and timers. Stay consistent, and efficiency will follow effortlessly!</div>
-        </div>
-    </section>
+    <script>
+        const cursor = document.querySelector(".cursor");
+        const glow = document.querySelector(".cursor-glow");
+        const ripple = document.querySelector(".cursor-ripple");
 
-    <!-- Footer -->
-    <footer class="footer">
-        <a href="#">About</a>
-        <a href="#">Privacy</a>
-        <a href="#">Contact</a>
-    </footer>
+        document.addEventListener("mousemove", function(e) {
+            cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+            glow.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+            ripple.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+        });
 
-    <script src="script.js"></script>
+        document.querySelectorAll("a, button").forEach((element) => {
+            element.addEventListener("mouseenter", () => {
+                cursor.classList.add("hover");
+                glow.classList.add("hover");
+            });
+            element.addEventListener("mouseleave", () => {
+                cursor.classList.remove("hover");
+                glow.classList.remove("hover");
+            });
+        });
+
+        function use() {
+            alert("Have a look at Explore and Advancement section!");
+        }
+    </script>
 </body>
 </html>
