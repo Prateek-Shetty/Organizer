@@ -7,23 +7,27 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #343541;
+            background-color: #121212;
             color: #ffffff;
             text-align: center;
             margin: 0;
             padding: 20px;
+            overflow: hidden;
+            cursor: none;
         }
 
         #chatbox {
             width: 50%;
             margin: 20px auto;
             padding: 15px;
-            background-color: #444654;
+            background-color: #1e1e2e;
             border-radius: 10px;
             height: 400px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+            box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease-in-out;
         }
 
         .message {
@@ -33,6 +37,13 @@
             max-width: 80%;
             word-wrap: break-word;
             display: inline-block;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .user {
@@ -56,6 +67,12 @@
             background-color: #40414F;
             color: white;
             outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            background-color: #55576a;
+            transform: scale(1.05);
         }
 
         button {
@@ -65,26 +82,28 @@
             background-color: #0da37f;
             color: white;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
         }
 
         button:hover {
             background-color: #08966b;
+            transform: scale(1.1);
         }
-        pre {
-    background-color: #2d2d2d;
-    color: #ffffff;
-    padding: 10px;
-    border-radius: 5px;
-    overflow-x: auto;
-    font-size: 14px;
-}
 
-code {
-    font-family: "Courier New", monospace;
-    white-space: pre-wrap;
-}
-
+        /* Cursor Fire Effect */
+        .cursor {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: radial-gradient(circle, rgba(255,69,0,1) 0%, rgba(255,140,0,0) 80%);
+            border-radius: 50%;
+            pointer-events: none;
+            mix-blend-mode: lighten;
+            transition: transform 0.1s linear;
+            box-shadow: 0 0 10px rgba(255, 69, 0, 0.7);
+        }
     </style>
 </head>
 <body>
@@ -92,6 +111,7 @@ code {
     <div id="chatbox"></div>
     <input type="text" id="userInput" placeholder="Type your message...">
     <button onclick="sendMessage()">Send</button>
+    <div id="cursorEffect"></div>
 
     <script>
         document.getElementById("userInput").addEventListener("keypress", function(event) {
@@ -106,7 +126,6 @@ code {
 
             if (!userInput.value.trim()) return;
 
-            // Display user message
             const userMessage = document.createElement("p");
             userMessage.classList.add("message", "user");
             userMessage.innerHTML = `<strong>You:</strong> ${userInput.value}`;
@@ -120,8 +139,6 @@ code {
                 });
 
                 const data = await response.json();
-
-                // Display bot response
                 const botMessage = document.createElement("p");
                 botMessage.classList.add("message", "bot");
                 botMessage.innerHTML = `<strong>Bot:</strong> ${data.response}`;
@@ -134,10 +151,23 @@ code {
                 console.error(error);
             }
 
-            // Clear input and scroll chatbox
             userInput.value = "";
             chatbox.scrollTop = chatbox.scrollHeight;
         }
+
+        // Cursor Fire Effect
+        document.addEventListener("mousemove", function(e) {
+            let cursor = document.createElement("div");
+            cursor.classList.add("cursor");
+            document.body.appendChild(cursor);
+            cursor.style.left = e.pageX + "px";
+            cursor.style.top = e.pageY + "px";
+            cursor.style.transform = `translate(-50%, -50%) scale(${Math.random() * 2})`;
+
+            setTimeout(() => {
+                cursor.remove();
+            }, 300);
+        });
     </script>
 </body>
 </html>
