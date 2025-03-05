@@ -11,47 +11,40 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Poppins', sans-serif;
-            cursor: none;
         }
 
         body {
             background: linear-gradient(135deg, #1e1e2e, #3a3a50);
             color: white;
             overflow-x: hidden;
-            position: relative;
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
 
         /* Navbar */
         nav {
             background: rgba(0, 0, 0, 0.8);
             padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        nav ul {
-            list-style: none;
-            margin: 0 auto;
-            padding: 0;
+            width: 100%;
             display: flex;
             justify-content: center;
-            flex-grow: 1;
         }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+        }
+
         nav ul li {
             margin: 0 20px;
         }
+
         nav ul li a {
             color: white;
             text-decoration: none;
             font-size: 18px;
-        }
-        nav div {
-            flex-shrink: 0;
-            font-size: 20px;
-            color: white;
         }
 
         /* Timer Container */
@@ -66,14 +59,17 @@
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
             flex-grow: 1;
         }
+
         h2 {
             margin-bottom: 20px;
         }
+
         .timer-display {
             font-size: 48px;
             margin: 20px 0;
             font-weight: bold;
         }
+
         button {
             padding: 10px 20px;
             margin: 10px;
@@ -83,9 +79,11 @@
             border-radius: 5px;
             transition: 0.3s;
         }
+
         .start-btn { background: green; color: white; }
         .pause-btn { background: orange; color: white; }
         .reset-btn { background: red; color: white; }
+
         input {
             padding: 8px;
             margin: 10px;
@@ -103,72 +101,18 @@
             width: 100%;
             margin-top: auto;
         }
+
         footer a {
             color: white;
             text-decoration: none;
             margin: 10px;
         }
-
-        /* Custom Cursor */
-        .cursor {
-            width: 12px;
-            height: 12px;
-            background: white;
-            border-radius: 50%;
-            position: absolute;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 999;
-            mix-blend-mode: difference;
-        }
-
-        /* Black Fire Effect */
-        .fire-effect {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            background: radial-gradient(circle, rgba(0, 0, 0, 0.8) 20%, rgba(0, 0, 0, 0) 80%);
-            border-radius: 50%;
-            pointer-events: none;
-            filter: blur(12px);
-            opacity: 0.8;
-            transform: translate(-50%, -50%);
-            transition: transform 0.02s ease-out;
-            z-index: 998;
-            animation: flicker 0.2s infinite alternate;
-        }
-
-        @keyframes flicker {
-            0% { opacity: 0.7; transform: scale(1.1); }
-            100% { opacity: 1; transform: scale(1.3); }
-        }
-
-        /* Black Fire Particles */
-        .particle {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 50%;
-            pointer-events: none;
-            opacity: 0.7;
-            animation: fly 1s linear infinite;
-        }
-
-        @keyframes fly {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-30px) scale(0.3); opacity: 0; }
-        }
     </style>
 </head>
 <body>
 
-    <div class="cursor"></div>
-    <div class="fire-effect"></div>
-
     <!-- Navbar -->
     <nav>
-        <div>TimelyMind</div>
         <ul>
             <li><a href="index.html">Home</a></li>
         </ul>
@@ -195,28 +139,65 @@
     </footer>
 
     <script>
-        const cursor = document.querySelector(".cursor");
-        const fireEffect = document.querySelector(".fire-effect");
+        let timer;
+        let timeLeft;
+        let isRunning = false;
+        let workDuration = 25 * 60;
+        let breakDuration = 5 * 60;
+        let isWorkSession = true;
 
-        document.addEventListener("mousemove", function(e) {
-            cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-            fireEffect.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-        });
+        const timerDisplay = document.getElementById("timer");
+        const workInput = document.getElementById("workDuration");
+        const breakInput = document.getElementById("breakDuration");
 
-        function createParticles(x, y) {
-            let particle = document.createElement("div");
-            particle.classList.add("particle");
-            document.body.appendChild(particle);
-            particle.style.left = `${x + (Math.random() * 20 - 10)}px`;
-            particle.style.top = `${y + (Math.random() * 20 - 10)}px`;
-            particle.style.animationDuration = `${Math.random() * 1 + 0.5}s`;
-            particle.style.transform = `scale(${Math.random() * 1.5})`;
-            setTimeout(() => particle.remove(), 1000);
+        function updateDisplay() {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
         }
 
-        document.addEventListener("mousemove", function(e) {
-            createParticles(e.clientX, e.clientY);
-        });
+        function setTimer() {
+            workDuration = parseInt(workInput.value) * 60;
+            breakDuration = parseInt(breakInput.value) * 60;
+            timeLeft = workDuration;
+            isWorkSession = true;
+            updateDisplay();
+            resetTimer();
+        }
+
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                timer = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateDisplay();
+                    } else {
+                        clearInterval(timer);
+                        isRunning = false;
+                        isWorkSession = !isWorkSession;
+                        timeLeft = isWorkSession ? workDuration : breakDuration;
+                        startTimer(); // Auto-start next session
+                    }
+                }, 1000);
+            }
+        }
+
+        function pauseTimer() {
+            clearInterval(timer);
+            isRunning = false;
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            timeLeft = isWorkSession ? workDuration : breakDuration;
+            updateDisplay();
+        }
+
+        // Initialize Timer Display
+        timeLeft = workDuration;
+        updateDisplay();
     </script>
 
 </body>

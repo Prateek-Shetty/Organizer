@@ -223,6 +223,8 @@
             let task = { name: taskName, priority: priority };
             saveTask(task);
             displayTasks();
+            document.getElementById("taskName").value = "";
+
         }
 
         function saveTask(task) {
