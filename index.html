@@ -116,7 +116,7 @@
             font-weight: bold;
         }
 
-        .nav-links {
+        /* .nav-links {
             display: flex;
             list-style: none;
             gap: 20px;
@@ -131,7 +131,50 @@
 
         .nav-links a:hover {
             color: #ffca2c;
-        }
+        } */
+
+        /* Dropdown Menu Styling */
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links li {
+    position: relative;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: rgba(0, 0, 0, 0.9);
+    min-width: 150px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    padding: 10px 0;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 10px 15px;
+    color: white;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.dropdown-menu a:hover {
+    background: #ffca2c;
+    color: black;
+    border-radius: 5px;
+}
+
+/* Show dropdown on hover */
+.nav-links li:hover .dropdown-menu {
+    display: block;
+}
+
 
         .auth-buttons a {
             padding: 8px 12px;
@@ -239,7 +282,7 @@
     <div class="cursor-glow"></div>
     <div class="cursor-ripple"></div>
 
-    <nav class="navbar">
+    <!-- <nav class="navbar">
         <div class="logo">TimelyMind</div>
         <ul class="nav-links">
             <li><a href="#">Home</a></li>
@@ -249,7 +292,39 @@
         <div class="auth-buttons">
             <a href="sign.html">Login / Sign Up</a>
         </div>
+    </nav> -->
+
+    <nav class="navbar">
+        <div class="logo">TimelyMind</div>
+        <ul class="nav-links">
+            <li>Home</li>
+            <li>
+                Explore
+                <div class="dropdown-menu">
+                    <a href="pomodoro.html">POMODORO</a>
+                    <a href="priority.html">PRIORITY</a>
+                    <a href="count.html">COUNT</a>
+                    <a href="reminder.html">REMINDER</a>
+                    <a href="table.html">TIME TABLE</a>
+                </div>
+            </li>
+            <li>
+                Advancement
+                <div class="dropdown-menu">
+                    <a href="bot.html">AI CHAT BOT</a>
+                    <a href="material.html">GROUP STUDY</a>
+                    <a href="progress.html">PROGRESS </a>
+                    <a href="board.html">BOARD</a>
+                    <a href="quiz.html">QUIZ</a>
+                    <a href="task-track.html">TASK TRACK</a>
+                </div>
+            </li>
+        </ul>
+        <div class="auth-buttons">
+            <a href="sign.html">Login / Sign Up</a>
+        </div>
     </nav>
+
 
     <div class="hero">
         <h1>Plan, Track, and Achieve!</h1>
